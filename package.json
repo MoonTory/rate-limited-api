@@ -1,0 +1,11 @@
+{
+  "name": "rate-limited-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:MoonTory/rate-limited-api.git",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ]
+}
