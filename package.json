@@ -1,11 +1,15 @@
 {
-  "name": "rate-limited-api",
-  "version": "1.0.0",
-  "main": "index.js",
-  "repository": "git@github.com:MoonTory/rate-limited-api.git",
-  "license": "MIT",
-  "private": true,
-  "workspaces": [
-    "packages/*"
-  ]
+	"name": "rate-limited-api",
+	"version": "1.0.0",
+	"main": "index.js",
+	"repository": "git@github.com:MoonTory/rate-limited-api.git",
+	"license": "MIT",
+	"private": true,
+	"workspaces": [
+		"packages/*"
+	],
+	"scripts": {
+		"start:dev": "docker compose up",
+		"docker:kill": "docker stop $(docker ps -a -q) && docker rm $(docker ps -aq) && docker rmi $(docker images -q)"
+	}
 }

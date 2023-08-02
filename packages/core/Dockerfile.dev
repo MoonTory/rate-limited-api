@@ -1,0 +1,22 @@
+FROM node:lts-alpine
+
+RUN mkdir -p /app
+
+WORKDIR /app
+
+COPY ./package.json .
+COPY ./packages/core/package.json ./packages/core/
+
+RUN npm install -g npm
+# RUN npm i -g yarn
+RUN yarn install
+
+COPY ./packages/core ./packages/core
+
+WORKDIR /app/packages/core
+
+RUN yarn install
+
+EXPOSE 5002
+
+CMD ["yarn", "start:dev"]
