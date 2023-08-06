@@ -9,7 +9,8 @@
 		"packages/*"
 	],
 	"scripts": {
-		"start:dev": "docker compose up",
+		"bootstrap": "chmod u+rx ./scripts/start_services.sh",
+		"start:dev": "ENV=development ./scripts/start_services.sh",
 		"docker:kill": "docker stop $(docker ps -a -q) && docker rm $(docker ps -aq) && docker rmi $(docker images -q)"
 	}
 }

@@ -3,7 +3,7 @@ services:
   core:
     build:
       context: ./
-      dockerfile: ./packages/core/Dockerfile
+      dockerfile: ./packages/core/Dockerfile.dev
     volumes:
       - "./packages/core:/app/packages/core"
     env_file:
@@ -12,6 +12,14 @@ services:
       - "5002:5002"
     depends_on:
       - "mongo"
+      - "redis"
+    networks:
+      - bridge-network
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
     networks:
       - bridge-network
 
