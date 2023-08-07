@@ -26,10 +26,10 @@
 - [Table of Contents](#table-of-contents)
 	- [Description](#description)
 	- [Motivation](#motivation)
+	- [Summary of the App](#summary-of-the-app)
 	- [Requirements](#requirements)
 	- [Prerequisites](#prerequisites)
 	- [How to Run the Demo](#how-to-run-the-demo)
-	- [Summary of the App](#summary-of-the-app)
 	- [Built With](#built-with)
 	- [Author(s)](#authors)
 	- [License](#license)
@@ -41,6 +41,20 @@
 ## Motivation
 
 This project was created to show off an ability to adhere to strict requirements, and to demonstrate skills in planning and organizing a project. It is not just about the implementation of the rate-limiter, but also about project organization and the use of workspaces.
+
+## Summary of the App
+
+The application is divided into two main packages, 'core' and 'client'.
+
+The 'core' package is the primary server, written in TypeScript, which includes a custom rate-limiter middleware. This middleware, leveraging Redis' MULTI/EXEC transaction functionality, ensures atomicity and concurrency between requests, effectively limiting the number of concurrent user requests to prevent server overloads.
+
+The rate-limiting algorithm used in this middleware is a 'fixed window' rate limiting algorithm, which is simple and efficient for most use cases. However, for real-world applications where more flexibility might be needed for users, it could be replaced with a 'sliding window' algorithm to provide a smoother rate limiting experience.
+
+If needed, this solution could be further scaled by replicating the number of Docker containers running or using Node.js `cluster` mode to add more concurrency to the server. Since we are using Redis transactions, atomicity would be maintained across all containers, providing a robust and scalable solution for handling high load scenarios.
+
+The 'client' package is a simple Node.js script that sends requests to the server, serving to test the rate-limiting functionality.
+
+All components of the application are containerized using Docker, allowing for quick and easy setup for development purposes using Docker Compose. This project structure ensures a high degree of scalability and ease of deployment, making it suitable for real-world applications beyond its original scope as a demonstration and test project.
 
 ## Requirements
 
@@ -89,18 +103,6 @@ After reaching the rate limit the server responds with the following `429` error
 ```
 
 Where `retryAfter` are seconds left until the user can retry to make a request & `nextValidRequestTime` is in a date format informing the user the exact time when they can make another request.
-
-## Summary of the App
-
-The application is divided into two main packages, 'core' and 'client'.
-
-The 'core' package is the primary server, written in TypeScript, which includes a custom rate-limiter middleware. This middleware, leveraging Redis' MULTI/EXEC transaction functionality, ensures atomicity and concurrency between requests, effectively limiting the number of concurrent user requests to prevent server overloads.
-
-If needed, this solution could be further scaled by replicating the number of Docker containers running or using Node.js `cluster` mode to add more concurrency to the server. Since we are using Redis transactions, atomicity would be maintained across all containers, providing a robust and scalable solution for handling high load scenarios.
-
-The 'client' package is a simple Node.js script that sends requests to the server, serving to test the rate-limiting functionality.
-
-All components of the application are containerized using Docker, allowing for quick and easy setup for development purposes using Docker Compose. This project structure ensures a high degree of scalability and ease of deployment, making it suitable for real-world applications beyond its original scope as a demonstration and test project.
 
 ## Built With
 
