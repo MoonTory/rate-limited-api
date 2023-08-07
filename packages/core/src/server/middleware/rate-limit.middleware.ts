@@ -39,7 +39,7 @@ export const rateLimit: Middleware =
 
 			// If it's the first request from this user or if we haven't reached the limit, reset the TTL
 			if (count === 1 || count <= limit) {
-				redis.expire(ip, expiration);
+				redis.expire(userIdentifier, expiration);
 			}
 
 			return next();
