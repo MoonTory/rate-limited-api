@@ -92,11 +92,15 @@ Where `retryAfter` are seconds left until the user can retry to make a request &
 
 ## Summary of the App
 
-The application is divided into two main packages. The 'core' package is the primary server, written in TypeScript, which includes the custom rate-limiter middleware. This middleware limits the number of concurrent user requests to prevent server overloads.
+The application is divided into two main packages, 'core' and 'client'.
 
-The 'client' package is a simple Node.js script that sends requests to the server to test the rate-limiting functionality.
+The 'core' package is the primary server, written in TypeScript, which includes a custom rate-limiter middleware. This middleware, leveraging Redis' MULTI/EXEC transaction functionality, ensures atomicity and concurrency between requests, effectively limiting the number of concurrent user requests to prevent server overloads.
 
-All of the components are containerized using Docker, and can be quickly and easily spun up for development purposes using Docker Compose.
+If needed, this solution could be further scaled by replicating the number of Docker containers running or using Node.js `cluster` mode to add more concurrency to the server. Since we are using Redis transactions, atomicity would be maintained across all containers, providing a robust and scalable solution for handling high load scenarios.
+
+The 'client' package is a simple Node.js script that sends requests to the server, serving to test the rate-limiting functionality.
+
+All components of the application are containerized using Docker, allowing for quick and easy setup for development purposes using Docker Compose. This project structure ensures a high degree of scalability and ease of deployment, making it suitable for real-world applications beyond its original scope as a demonstration and test project.
 
 ## Built With
 
