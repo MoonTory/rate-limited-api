@@ -11,7 +11,8 @@
 	"scripts": {
 		"dev": "docker-compose -f docker-compose.dev.yml up",
 		"dev:detached": "docker-compose -f docker-compose.dev.yml up -d",
-		"bootstrap": "chmod u+rx ./scripts/start_services.sh",
+		"bootstrap": "chmod u+rx ./scripts/start_services.sh && yarn",
+		"benchmark": "ab -c 10 -n 4000  \"http://localhost:5002/sync\"",
 		"scripts:start-services": "ENV=development ./scripts/start_services.sh",
 		"docker:kill": "docker stop $(docker ps -a -q) && docker rm $(docker ps -aq) && docker rmi $(docker images -q)"
 	}
