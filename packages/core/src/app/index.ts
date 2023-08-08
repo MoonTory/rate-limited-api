@@ -17,7 +17,6 @@ export class MicroApp extends IApplication {
 
 	public start = async () => {
 		await this._database.connect();
-		await this._redis.client.connect();
 		await this._server.listen();
 	};
 }
