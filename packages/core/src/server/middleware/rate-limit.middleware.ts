@@ -1,8 +1,8 @@
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 
 import { config } from '../../config';
-import { Redis } from '../../services';
 import { Middleware } from '../../typings';
+import { Redis, RedisCommandResults } from '../../services';
 
 export const rateLimit: Middleware =
 	(weight: number = 1) =>
@@ -18,12 +18,15 @@ export const rateLimit: Middleware =
 		const limit = req.user ? config.MAX_TOKEN_REQUEST_COUNT : config.MAX_IP_REQUEST_COUNT;
 
 		try {
-			multi.incrBy(userIdentifier, weight); // Get the current count
+			multi.incrby(userIdentifier, weight); // Get the current count
 			multi.ttl(userIdentifier); // Get the TTL
 
-			const [currentCount, currentTtl] = await multi.exec(true);
+			const responses = (await multi.exec()) as RedisCommandResults;
 
-			const ttl = parseInt(currentTtl as string);
+			const currentTtl = responses[1][1];
+			const currentCount = responses[0][1];
+
+			const ttl = parseInt(currentTtl as string) || 0;
 			const count = parseInt(currentCount as string) || 0;
 
 			if (count > limit) {
