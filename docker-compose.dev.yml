@@ -23,6 +23,17 @@ services:
     networks:
       - bridge-network
 
+  proxy:
+    image: nginx:alpine
+    ports:
+      - 80:80
+    volumes:
+      - ./packages/nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - core
+    networks:
+      - bridge-network
+
   mongo:
     image: "mongo"
     restart: always
