@@ -107,7 +107,7 @@ The following requirements were addressed in the development of this project:
 Follow these steps to get the demo up and running:
 
 1. **Clone the Repository:**
-   `git clone [repository-url]`
+   `git clone https://github.com/MoonTory/rate-limited-api.git`
 
 2. **Prerequisites:**
    Ensure you have `Node.js` and `Docker` installed. You can check by running:
