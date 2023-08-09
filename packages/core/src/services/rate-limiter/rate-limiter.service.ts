@@ -122,7 +122,7 @@ export class RateLimiter {
 		const refillRate = maxTokens / windowInSeconds; // Tokens added per second
 		const refillRateInMs = refillRate / 1000;
 
-		const result = (await this._redis.client.eval(
+		const [remainingTokens, lastRefill] = (await this._redis.client.eval(
 			script,
 			1,
 			userIdentifier,
@@ -130,20 +130,25 @@ export class RateLimiter {
 			maxTokens,
 			refillRateInMs,
 			now
-		)) as number;
-
-		const lastRefill = Array.isArray(result) ? result[1] : now;
-		const remainingTokens = Array.isArray(result) ? result[0] : result;
+		)) as any[];
 
 		if (remainingTokens < 0) {
-			const retryAfterSeconds = Math.ceil(Math.abs(remainingTokens) / refillRate);
-			const nextValidRequestTimestamp = lastRefill + retryAfterSeconds * 1000;
+			const elapsedTimeInSeconds = (now - lastRefill) / 1000;
+
+			const tokensRequired = weight - elapsedTimeInSeconds * refillRate;
+
+			const retryAfter = Math.ceil(tokensRequired / refillRate);
+
+			const tokensToBeRefilled = Math.abs(remainingTokens);
+			const secondsToRefill = Math.ceil(tokensToBeRefilled / refillRate);
+
+			const nextValidRequestTimestamp = Number(lastRefill) + secondsToRefill * 1000;
 			const nextValidRequestTime = new Date(nextValidRequestTimestamp);
 
 			return {
-				retryAfter: retryAfterSeconds,
-				message: 'Rate limit exceeded',
-				nextValidRequestTime: nextValidRequestTime
+				retryAfter,
+				nextValidRequestTime,
+				message: 'Rate limit exceeded'
 			};
 		}
 

@@ -19,5 +19,5 @@ if newTokenCount < weight then
 else
     redis.call('hset', userKey, 'tokenCount', newTokenCount - weight)
     redis.call('hset', userKey, 'lastRefill', now)
-    return newTokenCount - weight -- Positive means they can proceed, gives tokens remaining after request
+    return {newTokenCount - weight, lastRefill} -- Positive means they can proceed, gives tokens remaining after request
 end
