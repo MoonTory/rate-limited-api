@@ -1,14 +1,14 @@
 import { authJWT, rateLimit } from '../../../middleware';
 import { EndpointFunction } from '../../../../typings';
 
-export class PrivateWeightOneEndpoint extends EndpointFunction {
+export class FixedWeightTwoEndpoint extends EndpointFunction {
 	constructor() {
-		super([authJWT(), rateLimit()]);
+		super([authJWT(), rateLimit(2)]);
 	}
 
 	protected async executeImpl(): Promise<void | any> {
 		try {
-			return this.ok({ message: 'PrivateWeightOneEndpoint', status: 200 });
+			return this.ok({ message: 'FixedWeightTwoEndpoint', status: 200 });
 		} catch (error) {
 			this.next(error);
 		}

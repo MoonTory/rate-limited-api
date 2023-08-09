@@ -7,18 +7,32 @@ export default class PrivateController extends IController {
 	constructor(path: string, config: IConfig) {
 		super(path, config);
 		this._endpoints = {
-			one: new PrivateEndpoints.PrivateWeightOneEndpoint(),
-			two: new PrivateEndpoints.PrivateWeightTwoEndpoint(),
-			five: new PrivateEndpoints.PrivateWeightFiveEndpoint()
+			fixedOne: new PrivateEndpoints.FixedWeightOneEndpoint(),
+			fixedTwo: new PrivateEndpoints.FixedWeightTwoEndpoint(),
+			fixedFive: new PrivateEndpoints.FixedWeightFiveEndpoint(),
+			slidingOne: new PrivateEndpoints.SlidingWeightOneEndpoint(),
+			slidingTwo: new PrivateEndpoints.SlidingWeightTwoEndpoint(),
+			slidingFive: new PrivateEndpoints.SlidingWeightFiveEndpoint(),
+			bucketOne: new PrivateEndpoints.BucketWeightOneEndpoint(),
+			bucketTwo: new PrivateEndpoints.BucketWeightTwoEndpoint(),
+			bucketFive: new PrivateEndpoints.BucketWeightFiveEndpoint()
 		};
 
 		this.init();
 	}
 
 	public async init() {
-		this.router.get(this._path + '/one', ...this._endpoints['one'].middlewares, this._endpoints['one'].execute());
-		this.router.get(this._path + '/two', ...this._endpoints['two'].middlewares, this._endpoints['two'].execute());
-		this.router.get(this._path + '/five', ...this._endpoints['five'].middlewares, this._endpoints['five'].execute());
+		this.router.get(this._path + '/fixed/one', ...this._endpoints['fixedOne'].middlewares, this._endpoints['fixedOne'].execute());
+		this.router.get(this._path + '/fixed/two', ...this._endpoints['fixedTwo'].middlewares, this._endpoints['fixedTwo'].execute());
+		this.router.get(this._path + '/fixed/five', ...this._endpoints['fixedFive'].middlewares, this._endpoints['fixedFive'].execute());
+
+		this.router.get(this._path + '/sliding/one', ...this._endpoints['slidingOne'].middlewares, this._endpoints['slidingOne'].execute());
+		this.router.get(this._path + '/sliding/two', ...this._endpoints['slidingTwo'].middlewares, this._endpoints['slidingTwo'].execute());
+		this.router.get(this._path + '/sliding/five', ...this._endpoints['slidingFive'].middlewares, this._endpoints['slidingFive'].execute());
+
+		this.router.get(this._path + '/bucket/one', ...this._endpoints['bucketOne'].middlewares, this._endpoints['bucketOne'].execute());
+		this.router.get(this._path + '/bucket/two', ...this._endpoints['bucketTwo'].middlewares, this._endpoints['bucketTwo'].execute());
+		this.router.get(this._path + '/bucket/five', ...this._endpoints['bucketFive'].middlewares, this._endpoints['bucketFive'].execute());
 
 		console.log(this._path + ' ' + 'Initialized successfully...');
 	}
