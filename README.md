@@ -121,7 +121,7 @@ Follow these steps to get the demo up and running:
    Navigate to the project's root directory and run: `yarn`
 
 5. **Setup Environment Variables:**
-   Duplicate `.env.example` and rename the copy to `.env`. The variables are already set with default values, but you can modify them if needed.
+   Duplicate `.env.example` and rename the copy to `.env` in both core and client packages. The variables are already set with default values, but you can modify them if needed.
 
 6. **Start the Server:**
    Run the following command to build Docker images and run the server along with Redis containers: `yarn dev`
@@ -164,7 +164,6 @@ Private endpoints require a valid JWT bearer token set in the headers.
 - `http://localhost/v1/private/fixed/one`
 - `http://localhost/v1/private/fixed/two`
 - `http://localhost/v1/private/fixed/five`
-- `http://localhost/v1/private/sliding/one`
 - `http://localhost/v1/private/sliding/one`
 - `http://localhost/v1/private/sliding/two`
 - `http://localhost/v1/private/sliding/five`
