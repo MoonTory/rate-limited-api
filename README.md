@@ -155,6 +155,8 @@ The following are the available public endpoints:
 - `http://localhost/v1/public/bucket/two`
 - `http://localhost/v1/public/bucket/five`
 
+> ⚠️ **Note:** For testing purposes, there's a public route available to clear the Redis cache: `http://localhost/clear-cache`. This route is intended for development only and would not be available in a production environment.
+
 ### Private Endpoints:
 
 Private endpoints require a valid JWT bearer token set in the headers.

@@ -44,7 +44,8 @@ export class MicroServer extends IServer {
 		this._express.use(passport.initialize());
 
 		this._express.use('/hit', getHostname());
-		this._express.use('/clear-cache', clearCache());
+
+		this._config.NODE_ENV === 'development' ? this._express.use('/clear-cache', clearCache()) : null;
 
 		this._express.use(this._api.router);
 
