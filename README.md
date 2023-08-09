@@ -26,10 +26,18 @@
 - [Table of Contents](#table-of-contents)
 	- [Description](#description)
 	- [Motivation](#motivation)
-	- [Summary of the App](#summary-of-the-app)
+	- [Application Overview](#application-overview)
+		- [Core Package](#core-package)
+			- [Rate-limiter Middlewares](#rate-limiter-middlewares)
+			- [Scalability](#scalability)
+		- [Client Package](#client-package)
+		- [Containerization](#containerization)
 	- [Requirements](#requirements)
 	- [Prerequisites](#prerequisites)
 	- [How to Run the Demo](#how-to-run-the-demo)
+		- [Public Endpoints:](#public-endpoints)
+		- [Private Endpoints:](#private-endpoints)
+		- [Rate Limit Exceeded Response:](#rate-limit-exceeded-response)
 	- [Built With](#built-with)
 	- [Author(s)](#authors)
 	- [License](#license)
@@ -42,17 +50,34 @@
 
 This project was created to show off an ability to adhere to strict requirements, and to demonstrate skills in planning and organizing a project. It is not just about the implementation of the rate-limiter, but also about project organization and the use of workspaces.
 
-## Summary of the App
+## Application Overview
 
-The application is divided into two main packages, 'core' and 'client'.
+The application is divided into two main packages: `core` and `client`.
 
-The 'core' package is the primary server, written in TypeScript, which includes a custom rate-limiter middleware. This middleware, leveraging Redis' MULTI/EXEC transaction functionality, ensures atomicity and concurrency between requests, effectively limiting the number of concurrent user requests to prevent server overloads.
+### Core Package
 
-The rate-limiting algorithm used in this middleware is a 'fixed window' rate limiting algorithm, which is simple and efficient for most use cases. However, for real-world applications where more flexibility might be needed for users, it could be replaced with a 'sliding window' algorithm to provide a smoother rate limiting experience.
+The `core` package is the primary server, written in TypeScript.
+
+#### Rate-limiter Middlewares
+
+Three different rate-limiter middlewares were implemented:
+
+1. **Fixed Window**: This approach divides time into fixed windows (e.g., every minute) and allows a specific number of requests in each window. Once the limit is reached, all further requests are blocked until the next window. Located at `./packages/core/server/middleware/rate-limit.middleware.ts`.
+2. **Sliding Window**: Unlike the fixed window, the sliding window looks at a rolling time frame. If a user hits their limit, they would need to wait until their oldest request falls out of the current window before they can send another. Located at `./packages/core/server/middleware/rate-limit-sliding.middleware.ts`.
+
+3. **Token Bucket**: In this method, tokens are added to a bucket at a fixed rate. A request consumes a token to proceed. If the bucket is out of tokens, the request is throttled. This offers some flexibility as it can allow for brief bursts of traffic. Located at `./packages/core/server/middleware/rate-limit-bucket.middleware.ts`.
+
+Leveraging Redis' MULTI/EXEC transaction functionality, these middlewares ensure atomicity and concurrency between requests, effectively limiting the number of concurrent user requests to prevent server overloads.
+
+#### Scalability
 
 If needed, this solution could be further scaled by replicating the number of Docker containers running or using Node.js `cluster` mode to add more concurrency to the server. Since we are using Redis transactions, atomicity would be maintained across all containers, providing a robust and scalable solution for handling high load scenarios.
 
-The 'client' package is a simple Node.js script that sends requests to the server, serving to test the rate-limiting functionality.
+### Client Package
+
+The `client` package is a simple Node.js script that sends requests to the server, serving to test the rate-limiting functionality.
+
+### Containerization
 
 All components of the application are containerized using Docker, allowing for quick and easy setup for development purposes using Docker Compose. This project structure ensures a high degree of scalability and ease of deployment, making it suitable for real-world applications beyond its original scope as a demonstration and test project.
 
@@ -79,20 +104,77 @@ The following requirements were addressed in the development of this project:
 
 ## How to Run the Demo
 
-1. Clone this repository from GitHub.
-2. Ensure you have the required tools installed as described above (Node.js & Docker).
-3. Install Yarn globally if it's not already installed, using `npm install -g yarn`.
-4. In the root directory of the project, run `yarn` to install all dependencies.
-5. Run `yarn dev` to execute the `docker-compose -f docker-compose.dev.yml up` command. This builds the Docker images and runs the server and Redis containers.
-6. Open another terminal window. Navigate into the client package directory with `cd packages/client`.
-7. Run `yarn start` to start the client test script.
-8. The output of the script should look something like the following
+Follow these steps to get the demo up and running:
+
+1. **Clone the Repository:**
+   `git clone [repository-url]`
+
+2. **Prerequisites:**
+   Ensure you have `Node.js` and `Docker` installed. You can check by running:
+   `node -v`
+   `docker -v`
+
+3. **Install Yarn:**
+   If Yarn isn't installed, install it globally using: `npm install -g yarn`
+
+4. **Install Dependencies:**
+   Navigate to the project's root directory and run: `yarn`
+
+5. **Setup Environment Variables:**
+   Duplicate `.env.example` and rename the copy to `.env`. The variables are already set with default values, but you can modify them if needed.
+
+6. **Start the Server:**
+   Run the following command to build Docker images and run the server along with Redis containers: `yarn dev`
+
+7. **Run the Client:**
+   In a new terminal window, navigate to the client package directory: `cd packages/client`
+   Then, start the client test script: `yarn start`
+
+8. **Demo Output:**
+   The script's output should resemble the image below:
 
 <p align="center">
 <img src="./assets/demo-output.png" alt="alt text" width="200"/>
 </p>
 
-After reaching the rate limit the server responds with the following `429` error.
+9. **Alternative Testing Tools:**
+   You can also test using tools like Apache Benchmark (pre-installed on MacOS) or the npm library `autocannon`.
+
+### Public Endpoints:
+
+The following are the available public endpoints:
+
+- `http://localhost/v1/public/fixed/one`
+- `http://localhost/v1/public/fixed/two`
+- `http://localhost/v1/public/fixed/five`
+- `http://localhost/v1/public/sliding/one`
+- `http://localhost/v1/public/sliding/one`
+- `http://localhost/v1/public/sliding/two`
+- `http://localhost/v1/public/sliding/five`
+- `http://localhost/v1/public/bucket/one`
+- `http://localhost/v1/public/bucket/two`
+- `http://localhost/v1/public/bucket/five`
+
+### Private Endpoints:
+
+Private endpoints require a valid JWT bearer token set in the headers.
+
+> **Note:** Generate a new JWT token inside the `client` directory by running `npm run generate:jwt` or use the provided token in the example .env file.
+
+- `http://localhost/v1/private/fixed/one`
+- `http://localhost/v1/private/fixed/two`
+- `http://localhost/v1/private/fixed/five`
+- `http://localhost/v1/private/sliding/one`
+- `http://localhost/v1/private/sliding/one`
+- `http://localhost/v1/private/sliding/two`
+- `http://localhost/v1/private/sliding/five`
+- `http://localhost/v1/private/bucket/one`
+- `http://localhost/v1/private/bucket/two`
+- `http://localhost/v1/private/bucket/five`
+
+### Rate Limit Exceeded Response:
+
+If the rate limit is exceeded, the server will respond with a `429` error. The error body will look something like:
 
 ```json
 {
@@ -102,7 +184,8 @@ After reaching the rate limit the server responds with the following `429` error
 }
 ```
 
-Where `retryAfter` are seconds left until the user can retry to make a request & `nextValidRequestTime` is in a date format informing the user the exact time when they can make another request.
+- `retryAfter`: Represents the seconds remaining until the user can attempt another request.
+- `nextValidRequestTime`: Indicates the exact time (in UTC) when the next request can be made.
 
 ## Built With
 
@@ -110,6 +193,7 @@ Where `retryAfter` are seconds left until the user can retry to make a request &
 - [NodeJs](https://nodejs.org/en/)
 - [Redis](https://redis.io/)
 - [Docker](https://www.docker.com)
+- [Nginx](https://nginx.org/en/docs/)
 
 ## Author(s)
 
@@ -117,5 +201,4 @@ Where `retryAfter` are seconds left until the user can retry to make a request &
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for
-details
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
