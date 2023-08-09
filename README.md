@@ -62,10 +62,13 @@ The `core` package is the primary server, written in TypeScript.
 
 Three different rate-limiter middlewares were implemented:
 
-1. **Fixed Window**: This approach divides time into fixed windows (e.g., every minute) and allows a specific number of requests in each window. Once the limit is reached, all further requests are blocked until the next window. Located at `./packages/core/server/middleware/rate-limit.middleware.ts`.
-2. **Sliding Window**: Unlike the fixed window, the sliding window looks at a rolling time frame. If a user hits their limit, they would need to wait until their oldest request falls out of the current window before they can send another. Located at `./packages/core/server/middleware/rate-limit-sliding.middleware.ts`.
+1. **Fixed Window**: This approach divides time into fixed windows (e.g., every minute) and allows a specific number of requests in each window. Once the limit is reached, all further requests are blocked until the next window.
 
-3. **Token Bucket**: In this method, tokens are added to a bucket at a fixed rate. A request consumes a token to proceed. If the bucket is out of tokens, the request is throttled. This offers some flexibility as it can allow for brief bursts of traffic. Located at `./packages/core/server/middleware/rate-limit-bucket.middleware.ts`.
+2. **Sliding Window**: Unlike the fixed window, the sliding window looks at a rolling time frame. If a user hits their limit, they would need to wait until their oldest request falls out of the current window before they can send another.
+
+3. **Token Bucket**: In this method, tokens are added to a bucket at a fixed rate. A request consumes a token to proceed. If the bucket is out of tokens, the request is throttled. This offers some flexibility as it can allow for brief bursts of traffic.
+
+> The implementations can be found inside of the rate-limiter service `/packages/core/src/services/rate-limiter`
 
 Leveraging Redis' MULTI/EXEC transaction functionality, these middlewares ensure atomicity and concurrency between requests, effectively limiting the number of concurrent user requests to prevent server overloads.
 
