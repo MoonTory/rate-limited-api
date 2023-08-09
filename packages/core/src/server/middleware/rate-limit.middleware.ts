@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 
 import { config } from '../../config';
 import { Middleware } from '../../typings';
-import { Redis, RedisCommandResults } from '../../services';
+import { Redis, RedisPipelineResult } from '../../services';
 
 export const rateLimit: Middleware =
 	(weight: number = 1) =>
@@ -21,7 +21,7 @@ export const rateLimit: Middleware =
 			multi.incrby(userIdentifier, weight); // Get the current count
 			multi.ttl(userIdentifier); // Get the TTL
 
-			const responses = (await multi.exec()) as RedisCommandResults;
+			const responses = (await multi.exec()) as RedisPipelineResult;
 
 			const currentTtl = responses[1][1];
 			const currentCount = responses[0][1];

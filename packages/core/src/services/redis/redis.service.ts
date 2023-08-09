@@ -7,7 +7,7 @@ import { config } from '../../config';
 
 const scriptsDir = path.join(__dirname, './scripts');
 
-export type RedisCommandResults = [error: Error | null, result: any][];
+export type RedisPipelineResult = [error: Error | null, result: any][];
 
 export class Redis {
 	private static _instance: Redis;

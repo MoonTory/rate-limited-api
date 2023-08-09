@@ -30,8 +30,8 @@ export const rateLimitBucket: Middleware =
 
 				return res.status(429).json({
 					retryAfter: retryAfterSeconds,
-					nextValidRequestTime: nextValidRequestTime.toISOString(),
-					message: 'Rate limit exceeded'
+					message: 'Rate limit exceeded',
+					nextValidRequestTime: nextValidRequestTime.toISOString()
 				});
 			}
 
