@@ -5,7 +5,7 @@ const { v4: uuid } = require("uuid");
 
 const sendRequest = async (url, token) => {
 	try {
-		const initialConfig = { baseURL: "http://localhost:5002/" };
+		const initialConfig = { baseURL: "http://localhost/" };
 		const config =
 			token === undefined
 				? { ...initialConfig }
@@ -38,14 +38,19 @@ const generateToken = () => {
 };
 
 const endpointsPrivate = [
-	"/v1/private/one",
-	"/v1/private/two",
-	"/v1/private/five",
+	"/v1/private/fixed/one",
+	"/v1/private/fixed/two",
+	"/v1/private/fixed/five",
 ];
-const endpointsPublic = ["/v1/public/one", "/v1/public/two", "/v1/public/five"];
+
+const endpointsPublic = [
+	"/v1/public/fixed/one",
+	"/v1/public/fixed/two",
+	"/v1/public/fixed/five",
+];
 
 const testRateLimiter = async () => {
-	const totalRequests = 300;
+	const totalRequests = 400;
 
 	for (let endpoint of endpointsPrivate) {
 		const token = generateToken();
