@@ -8,7 +8,6 @@ export const rateLimit: Middleware =
 	(weight: number = 1) =>
 	async (req: Request, res: Response, next: NextFunction) => {
 		const redis = Redis.getInstance().client;
-		const multi = redis.multi();
 
 		const ip = (req.headers['x-forwarded-for'] as string) || (req.socket.remoteAddress as string);
 
@@ -18,6 +17,7 @@ export const rateLimit: Middleware =
 		const limit = req.user ? config.MAX_TOKEN_REQUEST_COUNT : config.MAX_IP_REQUEST_COUNT;
 
 		try {
+			const multi = redis.multi();
 			multi.incrby(userIdentifier, weight); // Get the current count
 			multi.ttl(userIdentifier); // Get the TTL
 

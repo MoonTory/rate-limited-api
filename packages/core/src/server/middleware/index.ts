@@ -4,3 +4,4 @@ export * from './auth';
 export * from './rate-limit.middleware';
 export * from './clear-cache.middleware';
 export * from './rate-limit-sliding.middleware';
+export * from './rate-limit-bucket.middleware';
