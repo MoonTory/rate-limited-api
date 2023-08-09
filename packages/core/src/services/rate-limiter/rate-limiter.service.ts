@@ -135,7 +135,8 @@ export class RateLimiter {
 		if (remainingTokens < 0) {
 			const elapsedTimeInSeconds = (now - lastRefill) / 1000;
 
-			const tokensRequired = weight - elapsedTimeInSeconds * refillRate;
+			const tokensRefilled = elapsedTimeInSeconds * refillRate;
+			const tokensRequired = weight - tokensRefilled;
 
 			const retryAfter = Math.ceil(tokensRequired / refillRate);
 
