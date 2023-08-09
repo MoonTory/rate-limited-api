@@ -2,6 +2,12 @@ import { v4 as uuid } from 'uuid';
 
 import { Redis, RedisPipelineResult } from '../redis';
 
+export type RateLimitResult = {
+	message: string;
+	retryAfter: number;
+	nextValidRequestTime: Date;
+} | null;
+
 export class RateLimiter {
 	private static _instance: RateLimiter;
 	private readonly _redis: Redis;
@@ -17,7 +23,12 @@ export class RateLimiter {
 		return RateLimiter._instance;
 	}
 
-	public fixedWindow = async (weight: number, userIdentifier: string, limit: number, expiration: number) => {
+	public fixedWindow = async (
+		weight: number,
+		userIdentifier: string,
+		limit: number,
+		expiration: number
+	): Promise<RateLimitResult> => {
 		const multi = this._redis.client.multi();
 
 		multi.incrby(userIdentifier, weight); // Get the current count
@@ -50,7 +61,12 @@ export class RateLimiter {
 		return null;
 	};
 
-	public slidingWindow = async (weight: number, userIdentifier: string, limit: number, expiration: number) => {
+	public slidingWindow = async (
+		weight: number,
+		userIdentifier: string,
+		limit: number,
+		expiration: number
+	): Promise<RateLimitResult> => {
 		const now = Date.now();
 		const multi = this._redis.client.multi();
 
@@ -93,7 +109,12 @@ export class RateLimiter {
 		return null;
 	};
 
-	public bucketLimit = async (weight: number, userIdentifier: string, windowInSeconds: number, maxTokens: number) => {
+	public bucketLimit = async (
+		weight: number,
+		userIdentifier: string,
+		windowInSeconds: number,
+		maxTokens: number
+	): Promise<RateLimitResult> => {
 		const script = this._redis.scripts['bucket-rate-limit'];
 
 		const now = Date.now();
@@ -101,17 +122,28 @@ export class RateLimiter {
 		const refillRate = maxTokens / windowInSeconds; // Tokens added per second
 		const refillRateInMs = refillRate / 1000;
 
-		const remainingTokens = (await this._redis.client.eval(script, 1, userIdentifier, weight, maxTokens, refillRateInMs, now)) as number;
+		const result = (await this._redis.client.eval(
+			script,
+			1,
+			userIdentifier,
+			weight,
+			maxTokens,
+			refillRateInMs,
+			now
+		)) as number;
+
+		const lastRefill = Array.isArray(result) ? result[1] : now;
+		const remainingTokens = Array.isArray(result) ? result[0] : result;
 
 		if (remainingTokens < 0) {
 			const retryAfterSeconds = Math.ceil(Math.abs(remainingTokens) / refillRate);
-			const nextValidRequestTimestamp = now + retryAfterSeconds * 1000;
+			const nextValidRequestTimestamp = lastRefill + retryAfterSeconds * 1000;
 			const nextValidRequestTime = new Date(nextValidRequestTimestamp);
 
 			return {
 				retryAfter: retryAfterSeconds,
 				message: 'Rate limit exceeded',
-				nextValidRequestTime: nextValidRequestTime.toISOString()
+				nextValidRequestTime: nextValidRequestTime
 			};
 		}
 

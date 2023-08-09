@@ -15,7 +15,7 @@ local newTokenCount = math.min(tokenCount + tokensToAdd, maxTokens)
 
 -- Check if the user can proceed with the request
 if newTokenCount < weight then
-    return newTokenCount - weight -- Negative means they can't proceed, gives amount over limit
+	return {newTokenCount - weight, lastRefill} -- Negative means they can't proceed, gives amount over limit
 else
     redis.call('hset', userKey, 'tokenCount', newTokenCount - weight)
     redis.call('hset', userKey, 'lastRefill', now)

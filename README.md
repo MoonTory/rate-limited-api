@@ -151,7 +151,6 @@ The following are the available public endpoints:
 - `http://localhost/v1/public/fixed/two`
 - `http://localhost/v1/public/fixed/five`
 - `http://localhost/v1/public/sliding/one`
-- `http://localhost/v1/public/sliding/one`
 - `http://localhost/v1/public/sliding/two`
 - `http://localhost/v1/public/sliding/five`
 - `http://localhost/v1/public/bucket/one`
