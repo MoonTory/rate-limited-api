@@ -1,9 +1,9 @@
-import { authJWT, rateLimit } from '../../../middleware';
+import { authJWT, rateLimiter } from '../../../middleware';
 import { EndpointFunction } from '../../../../typings';
 
 export class FixedWeightOneEndpoint extends EndpointFunction {
 	constructor() {
-		super([authJWT(), rateLimit()]);
+		super([authJWT(), rateLimiter()]);
 	}
 
 	protected async executeImpl(): Promise<void | any> {

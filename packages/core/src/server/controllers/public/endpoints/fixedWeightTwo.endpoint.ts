@@ -1,9 +1,9 @@
-import { rateLimit } from '../../../middleware';
+import { rateLimiter } from '../../../middleware';
 import { EndpointFunction } from '../../../../typings';
 
 export class FixedWeightTwoEndpoint extends EndpointFunction {
 	constructor() {
-		super([rateLimit(2)]);
+		super([rateLimiter(2)]);
 	}
 
 	protected async executeImpl(): Promise<void | any> {

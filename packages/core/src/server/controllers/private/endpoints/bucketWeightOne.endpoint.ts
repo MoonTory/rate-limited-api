@@ -1,9 +1,9 @@
-import { authJWT, rateLimitBucket } from '../../../middleware';
+import { authJWT, rateLimiter } from '../../../middleware';
 import { EndpointFunction } from '../../../../typings';
 
 export class BucketWeightOneEndpoint extends EndpointFunction {
 	constructor() {
-		super([authJWT(), rateLimitBucket()]);
+		super([authJWT(), rateLimiter(1, 'tokenBucket')]);
 	}
 
 	protected async executeImpl(): Promise<void | any> {

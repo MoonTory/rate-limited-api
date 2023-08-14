@@ -1,9 +1,9 @@
-import { authJWT, rateLimitSliding } from '../../../middleware';
+import { authJWT, rateLimiter } from '../../../middleware';
 import { EndpointFunction } from '../../../../typings';
 
 export class SlidingWeightOneEndpoint extends EndpointFunction {
 	constructor() {
-		super([authJWT(), rateLimitSliding()]);
+		super([authJWT(), rateLimiter(1, 'slidingWindow')]);
 	}
 
 	protected async executeImpl(): Promise<void | any> {

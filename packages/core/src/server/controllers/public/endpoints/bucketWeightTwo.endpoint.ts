@@ -1,9 +1,9 @@
-import { rateLimitBucket } from '../../../middleware';
+import { rateLimiter } from '../../../middleware';
 import { EndpointFunction } from '../../../../typings';
 
 export class BucketWeightTwoEndpoint extends EndpointFunction {
 	constructor() {
-		super([rateLimitBucket(2)]);
+		super([rateLimiter(2, 'tokenBucket')]);
 	}
 
 	protected async executeImpl(): Promise<void | any> {

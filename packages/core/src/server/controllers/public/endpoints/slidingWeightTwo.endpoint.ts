@@ -1,9 +1,9 @@
-import { rateLimitSliding } from '../../../middleware';
+import { rateLimiter } from '../../../middleware';
 import { EndpointFunction } from '../../../../typings';
 
 export class SlidingWeightTwoEndpoint extends EndpointFunction {
 	constructor() {
-		super([rateLimitSliding(2)]);
+		super([rateLimiter(2, 'slidingWindow')]);
 	}
 
 	protected async executeImpl(): Promise<void | any> {

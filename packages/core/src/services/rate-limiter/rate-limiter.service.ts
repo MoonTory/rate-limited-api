@@ -6,7 +6,9 @@ export type RateLimitResult = {
 	message: string;
 	retryAfter: number;
 	nextValidRequestTime: Date;
-} | null;
+};
+
+export type RateLimitStrategy = 'fixedWindow' | 'slidingWindow' | 'tokenBucket';
 
 export class RateLimiter {
 	private static _instance: RateLimiter;
@@ -28,7 +30,7 @@ export class RateLimiter {
 		userIdentifier: string,
 		limit: number,
 		expiration: number
-	): Promise<RateLimitResult> => {
+	): Promise<RateLimitResult | null> => {
 		const multi = this._redis.client.multi();
 
 		multi.incrby(userIdentifier, weight); // Get the current count
@@ -66,7 +68,7 @@ export class RateLimiter {
 		userIdentifier: string,
 		limit: number,
 		expiration: number
-	): Promise<RateLimitResult> => {
+	): Promise<RateLimitResult | null> => {
 		const now = Date.now();
 		const multi = this._redis.client.multi();
 
@@ -109,12 +111,12 @@ export class RateLimiter {
 		return null;
 	};
 
-	public bucketLimit = async (
+	public tokenBucket = async (
 		weight: number,
 		userIdentifier: string,
-		windowInSeconds: number,
-		maxTokens: number
-	): Promise<RateLimitResult> => {
+		maxTokens: number,
+		windowInSeconds: number
+	): Promise<RateLimitResult | null> => {
 		const script = this._redis.scripts['bucket-rate-limit'];
 
 		const now = Date.now();
