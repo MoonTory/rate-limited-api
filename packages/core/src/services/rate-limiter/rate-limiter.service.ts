@@ -25,6 +25,12 @@ export class RateLimiter {
 		return RateLimiter._instance;
 	}
 
+	private result = (retryAfter: number, nextValidRequestTime: Date): RateLimitResult => ({
+		retryAfter,
+		nextValidRequestTime,
+		message: 'Rate limit exceeded'
+	});
+
 	public fixedWindow = async (
 		weight: number,
 		userIdentifier: string,
@@ -48,11 +54,7 @@ export class RateLimiter {
 			const resetTime = new Date();
 			resetTime.setSeconds(resetTime.getSeconds() + ttl);
 
-			return {
-				retryAfter: ttl,
-				message: 'Rate limit exceeded',
-				nextValidRequestTime: resetTime
-			};
+			return this.result(ttl, resetTime);
 		}
 
 		// If it's the first request from this user or if we haven't reached the limit, reset the TTL
@@ -88,6 +90,7 @@ export class RateLimiter {
 		const valuesArray = results[2][1];
 
 		let totalWeight = 0;
+
 		for (let i = 0; i < valuesArray.length; i++) {
 			totalWeight += parseInt(valuesArray[i].split('-')[0], 10);
 		}
@@ -96,11 +99,7 @@ export class RateLimiter {
 			const resetTime = new Date();
 			resetTime.setSeconds(resetTime.getSeconds() + expiration);
 
-			return {
-				retryAfter: expiration,
-				message: 'Rate limit exceeded',
-				nextValidRequestTime: resetTime
-			};
+			return this.result(expiration, resetTime);
 		}
 
 		// If this is the first entry or we are still below the limit, reset the TTL.
@@ -148,11 +147,7 @@ export class RateLimiter {
 			const nextValidRequestTimestamp = Number(lastRefill) + secondsToRefill * 1000;
 			const nextValidRequestTime = new Date(nextValidRequestTimestamp);
 
-			return {
-				retryAfter,
-				nextValidRequestTime,
-				message: 'Rate limit exceeded'
-			};
+			return this.result(retryAfter, nextValidRequestTime);
 		}
 
 		return null;
